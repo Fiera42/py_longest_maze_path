@@ -130,9 +130,9 @@ def visualize_path(maze, path):
         [cell.replace("0", ".") for cell in row] for row in visualized_path
     ]
 
-    # Replace walls with "0"
+    # Replace walls with "■"
     visualized_path = [
-        [cell.replace("1", "0") for cell in row] for row in visualized_path
+        [cell.replace("1", "■") for cell in row] for row in visualized_path
     ]
 
     # Define arrows for each direction
@@ -141,12 +141,13 @@ def visualize_path(maze, path):
     fallback_arrow = "?"  # Fallback arrow for unknown directions
 
     # Mark squares used by the path with arrows
-    for i in range(len(path) - 1):
+    for i in range(1, len(path) - 1):
         (row, col), (next_row, next_col) = path[i], path[i + 1]
         direction = (next_row - row, next_col - col)
         visualized_path[row][col] = arrows.get(direction, fallback_arrow)
 
     # Print the visualized path
+    print("\n")
     empty_spaces = 0
     for row in visualized_path:
         empty_spaces += row.count(".")
