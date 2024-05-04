@@ -14,22 +14,24 @@ from utils import (
 )
 
 
+def manhattan_distance(node, exit):
+    return abs(node[0] - exit[0]) + abs(node[1] - exit[1])
+
+
 def normalized_manhattan_distance(
     maze,
     node,
     exit,
 ):
-    manhattan_distance = abs(node[0] - exit[0]) + abs(node[1] - exit[1])
+    manhattan_dist = manhattan_distance(node, exit)
 
-    # Normalize the result between 0 and 1
+    # Normalize the result between 0 and 1 using the maze size as reference
     maze_height = len(maze)
     maze_width = len(maze[0])
-    max_distance = maze_height + maze_width
-    min_distance = 0
-    normalized_distance = (manhattan_distance - min_distance) / (
-        max_distance - min_distance
-    )
-    return normalized_distance
+    max_dist = (maze_height + maze_width) / 2
+    min_dist = 0
+    normalized_dist = (manhattan_dist - min_dist) / (max_dist - min_dist)
+    return normalized_dist
 
 
 def find_path_wave_collapse(maze, start, exit):
@@ -155,27 +157,27 @@ def create_longer_path(maze, shortest_path, depth=1):
         return longer_path
 
 
-maze = load_maze(os.path.join("mazes", "maze.txt"))
+maze = load_maze(os.path.join("mazes", "maze_zig_zag.txt"))
 start, exit = find_start_exit(maze)
 if start is not None and exit is not None:
     longest_path = find_path_wave_collapse(maze, start, exit)
 
+    """
     if longest_path:
         death_count = 0
         current_path = longest_path
 
         for i in tqdm(range(10000)):
-            prev = len(longest_path)
+            prev = len(current_path)
             current_path = create_longer_path(maze, current_path, depth=5)
 
             if len(current_path) > prev:
-                visualize_path(maze, current_path)
                 death_count = 0
                 if len(current_path) > len(longest_path):
                     longest_path = current_path
             else:
                 death_count += 1
-                if death_count > 250:
+                if death_count > 100:
                     temp = find_path_wave_collapse(maze, start, exit)
                     if temp:
                         visualize_path(maze, current_path)
@@ -183,7 +185,9 @@ if start is not None and exit is not None:
                         death_count = 0
 
         visualize_path(maze, longest_path)
-
+    """
+    if longest_path:
+        visualize_path(maze, longest_path)
     else:
         print("No path found from start to exit.")
 
