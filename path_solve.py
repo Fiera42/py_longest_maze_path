@@ -14,6 +14,24 @@ from utils import (
 )
 
 
+def normalized_manhattan_distance(
+    maze,
+    node,
+    exit,
+):
+    manhattan_distance = abs(node[0] - exit[0]) + abs(node[1] - exit[1])
+
+    # Normalize the result between 0 and 1
+    maze_height = len(maze)
+    maze_width = len(maze[0])
+    max_distance = maze_height + maze_width
+    min_distance = 0
+    normalized_distance = (manhattan_distance - min_distance) / (
+        max_distance - min_distance
+    )
+    return normalized_distance
+
+
 def find_path_wave_collapse(maze, start, exit):
     """
     Find the shortest path from start to exit in the maze using a modified wave function collapse algorithm.
@@ -63,7 +81,11 @@ def find_path_wave_collapse(maze, start, exit):
                 valid_moves = sum(
                     is_valid_move(maze, r, c, visited) for r, c in new_moves
                 )
-                move_counts.append((new_row, new_col, valid_moves))
+
+                move_anthropy = valid_moves + (
+                    1 - normalized_manhattan_distance(maze, (new_row, new_col), exit)
+                )
+                move_counts.append((new_row, new_col, move_anthropy))
 
         # Sort the potential moves based on the number of possible moves
         move_counts.sort(key=lambda x: x[2], reverse=True)
@@ -133,20 +155,34 @@ def create_longer_path(maze, shortest_path, depth=1):
         return longer_path
 
 
-maze = load_maze(os.path.join("mazes", "maze_zig_zag.txt"))
+maze = load_maze(os.path.join("mazes", "maze.txt"))
 start, exit = find_start_exit(maze)
 if start is not None and exit is not None:
-    shortest_path = find_path_wave_collapse(maze, start, exit)
+    longest_path = find_path_wave_collapse(maze, start, exit)
 
-    if shortest_path:
+    if longest_path:
+        death_count = 0
+        current_path = longest_path
+
         for i in tqdm(range(10000)):
-            prev = len(shortest_path)
-            shortest_path = create_longer_path(maze, shortest_path, depth=5)
-            if len(shortest_path) > prev:
-                visualize_path(maze, shortest_path)
-            # print(len(shortest_path))
+            prev = len(longest_path)
+            current_path = create_longer_path(maze, current_path, depth=5)
 
-        visualize_path(maze, shortest_path)
+            if len(current_path) > prev:
+                visualize_path(maze, current_path)
+                death_count = 0
+                if len(current_path) > len(longest_path):
+                    longest_path = current_path
+            else:
+                death_count += 1
+                if death_count > 250:
+                    temp = find_path_wave_collapse(maze, start, exit)
+                    if temp:
+                        visualize_path(maze, current_path)
+                        current_path = temp
+                        death_count = 0
+
+        visualize_path(maze, longest_path)
 
     else:
         print("No path found from start to exit.")
