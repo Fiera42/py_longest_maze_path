@@ -157,12 +157,11 @@ def create_longer_path(maze, shortest_path, depth=1):
         return longer_path
 
 
-maze = load_maze(os.path.join("mazes", "maze_zig_zag.txt"))
+maze = load_maze(os.path.join("mazes", "maze.txt"))
 start, exit = find_start_exit(maze)
 if start is not None and exit is not None:
     longest_path = find_path_wave_collapse(maze, start, exit)
 
-    """
     if longest_path:
         death_count = 0
         current_path = longest_path
@@ -184,9 +183,6 @@ if start is not None and exit is not None:
                         current_path = temp
                         death_count = 0
 
-        visualize_path(maze, longest_path)
-    """
-    if longest_path:
         visualize_path(maze, longest_path)
     else:
         print("No path found from start to exit.")
