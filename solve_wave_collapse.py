@@ -87,6 +87,7 @@ def find_path_wave_collapse(maze, start, exit):
                 move_anthropy = valid_moves + (
                     1 - normalized_manhattan_distance(maze, (new_row, new_col), exit)
                 )
+
                 move_counts.append((new_row, new_col, move_anthropy))
 
         # Sort the potential moves based on the number of possible moves
